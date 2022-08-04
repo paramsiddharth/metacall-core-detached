@@ -47,8 +47,8 @@ jobs:
           export "DETOUR_LIBRARY_PATH=$METACALL_PATH/build"
           export "PORT_LIBRARY_PATH=$METACALL_PATH/build"
           mkdir -p build
-          cd "$METACALL_PATH/build"
-          sudo ./tools/metacall-configure.sh $METACALL_BUILD_OPTIONS
+          cd build
+          sudo ./metacall-configure.sh $METACALL_BUILD_OPTIONS
         env:
           METACALL_BUILD_TYPE:         debug
           METACALL_BUILD_OPTIONS:      root python ruby netcore5 nodejs typescript file rpc wasm java c cobol examples tests scripts ports dynamic install pack sanitizer benchmarks # v8 coverage
