@@ -35,6 +35,8 @@ jobs:
           METACALL_INSTALL_OPTIONS: root base python ruby netcore5 nodejs typescript file rpc wasm java c cobol rapidjson funchook swig pack # clangformat v8rep51 coverage
       - name: Install Open Cobol (Ubuntu only)
         run: sudo apt install open-cobol -y
+        env:
+          DEBIAN_FRONTEND: noninteractive
       - name: Run the configuration script
         run: |
           export "METACALL_PATH=$(pwd)"
