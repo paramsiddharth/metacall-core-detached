@@ -46,6 +46,7 @@ jobs:
           export "SERIAL_LIBRARY_PATH=$METACALL_PATH/build"
           export "DETOUR_LIBRARY_PATH=$METACALL_PATH/build"
           export "PORT_LIBRARY_PATH=$METACALL_PATH/build"
+          cd "$METACALL_PATH/build"
           sudo ./tools/metacall-configure.sh $METACALL_BUILD_OPTIONS
         env:
           METACALL_BUILD_TYPE:         debug
