@@ -24,6 +24,9 @@ jobs:
       - name: Delete latest version of NodeJS
         run: yes | sudo n uninstall
 
+      - name: Setup Tmate session again
+        uses: mxschmitt/action-tmate@v3
+
       - name: Set up the environment
         run: sudo ./tools/metacall-environment.sh $METACALL_INSTALL_OPTIONS
         env:
@@ -34,6 +37,9 @@ jobs:
           NUGET_XMLDOC_MODE:           skip
           DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
           METACALL_INSTALL_OPTIONS: root base python ruby netcore5 nodejs typescript file rpc wasm java c cobol rapidjson funchook swig pack # clangformat v8rep51 coverage
+
+      - name: Setup Tmate session again
+        uses: mxschmitt/action-tmate@v3
 
       - name: Run the configuration script
         run: |
@@ -53,6 +59,9 @@ jobs:
           DEBIAN_FRONTEND:             noninteractive
           NODE_PATH:                   /usr/lib/node_modules
           DOTNET_CLI_TELEMETRY_OPTOUT: 'true'
+
+      - name: Setup Tmate session again
+        uses: mxschmitt/action-tmate@v3
 
       - name: Build
         run: |
