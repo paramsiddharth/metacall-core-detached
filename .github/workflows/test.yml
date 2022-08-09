@@ -94,6 +94,9 @@ jobs:
         with:
           fetch-depth: 0
       
+      - name: Setup Tmate session
+        uses: mxschmitt/action-tmate@v3
+
       - name: Set up the environment
         run: cmd /c "powershell .\tools\metacall-environment.ps1 $Env:METACALL_INSTALL_OPTIONS"
         env:
