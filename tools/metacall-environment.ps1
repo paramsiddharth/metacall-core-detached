@@ -1,38 +1,38 @@
-$global:ROOT_DIR = "$(pwd)"
+$Global:ROOT_DIR = "$(pwd)"
 
-$global:INSTALL_CHOCO = 1
-$global:INSTALL_PYTHON = 0
-$global:INSTALL_RUBY = 0
-$global:INSTALL_RUST = 0
-$global:INSTALL_RAPIDJSON = 0
-$global:INSTALL_FUNCHOOK = 0
-$global:INSTALL_NETCORE = 0
-$global:INSTALL_NETCORE2 = 0
-$global:INSTALL_NETCORE5 = 0
-$global:INSTALL_V8 = 0
-$global:INSTALL_V8REPO = 0
-$global:INSTALL_V8REPO58 = 0
-$global:INSTALL_V8REPO57 = 0
-$global:INSTALL_V8REPO54 = 0
-$global:INSTALL_V8REPO52 = 0
-$global:INSTALL_V8REPO51 = 0
-$global:INSTALL_NODEJS = 0
-$global:INSTALL_TYPESCRIPT = 0
-$global:INSTALL_FILE = 0
-$global:INSTALL_RPC = 0
-$global:INSTALL_WASM = 0
-$global:INSTALL_JAVA = 0
-$global:INSTALL_C = 0
-$global:INSTALL_COBOL = 0
-$global:INSTALL_SWIG = 0
-$global:INSTALL_METACALL = 0
-$global:INSTALL_PACK = 0
-$global:INSTALL_COVERAGE = 0
-$global:INSTALL_CLANGFORMAT = 0
-$global:SHOW_HELP = 0
-$global:PROGNAME = $(Get-Item $PSCommandPath).Basename
+$Global:INSTALL_CHOCO = 1
+$Global:INSTALL_PYTHON = 0
+$Global:INSTALL_RUBY = 0
+$Global:INSTALL_RUST = 0
+$Global:INSTALL_RAPIDJSON = 0
+$Global:INSTALL_FUNCHOOK = 0
+$Global:INSTALL_NETCORE = 0
+$Global:INSTALL_NETCORE2 = 0
+$Global:INSTALL_NETCORE5 = 0
+$Global:INSTALL_V8 = 0
+$Global:INSTALL_V8REPO = 0
+$Global:INSTALL_V8REPO58 = 0
+$Global:INSTALL_V8REPO57 = 0
+$Global:INSTALL_V8REPO54 = 0
+$Global:INSTALL_V8REPO52 = 0
+$Global:INSTALL_V8REPO51 = 0
+$Global:INSTALL_NODEJS = 0
+$Global:INSTALL_TYPESCRIPT = 0
+$Global:INSTALL_FILE = 0
+$Global:INSTALL_RPC = 0
+$Global:INSTALL_WASM = 0
+$Global:INSTALL_JAVA = 0
+$Global:INSTALL_C = 0
+$Global:INSTALL_COBOL = 0
+$Global:INSTALL_SWIG = 0
+$Global:INSTALL_METACALL = 0
+$Global:INSTALL_PACK = 0
+$Global:INSTALL_COVERAGE = 0
+$Global:INSTALL_CLANGFORMAT = 0
+$Global:SHOW_HELP = 0
+$Global:PROGNAME = $(Get-Item $PSCommandPath).Basename
 
-$global:Arguments = $args
+$Global:Arguments = $args
 
 # Base packages
 function sub-choco {
@@ -40,6 +40,12 @@ function sub-choco {
 	cd $ROOT_DIR
 	Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
 	refreshenv
+
+	if ( $null -eq $Env:ChocolateyInstall ) {
+		$Env:ChocolateyInstall = "$Env:SystemDrive\PraogramData\chocolatey"
+	}
+
+	$Global:ChocolateyBinPath = "$Env:ChocolateyInstall\bin"
 }
 
 # Swig
@@ -53,7 +59,66 @@ function sub-swig {
 function sub-python {
 	echo "configure python"
 	cd $ROOT_DIR
+
+	$PythonVersion = '3.9.7'
+	$RuntimeDir    = "$ROOT_DIR\runtimes\python"
+
+	<#
 	
+	# Avoiding; The Python installation provided by Chocolatey is statically compiled
+
+	$PythonVersion = '3.10.6'
+
+	choco install python3 --version $PythonVersion -my
+
+	$PythonPath = "$Env:ChocolateyInstall\lib\python3.$PythonVersion\tools"
+	$PythonBin = "$PythonPath\python-$PythonVersion-amd64.exe"
+
+	cmd.exe /c "mklink ""$PythonPath\python.exe"" ""$PythonBin"""
+	cmd.exe /c "mklink ""$ChocolateyBinPath\python.exe"" ""$PythonBin"""
+
+	setx /M PATH "$ChocolateyBinPath;$Env:PATH"
+	$Env:PATH = "$ChocolateyBinPath;$Env:PATH"
+
+	refreshenv
+
+	# DEBUG
+	# where.exe python
+	# # python.exe -c "from sysconfig import get_paths as gp; print(gp()['include'])"
+	# cmd.exe /c """$PythonBin"" -c ""from sysconfig import get_paths as gp; print(gp()['include'])"""
+	
+	# Patch for FindPython.cmake
+	# $FindPython = "$ROOT_DIR\cmake\FindPython.cmake"
+	# $EscapedLoc = $ROOT_DIR.Replace('\', '/')
+	# $PythonRuntimeDir = "$EscapedLoc/runtimes/python"
+
+	# echo set(Python_VERSION $PythonVersion) > $FindPython
+	# echo set(Python_ROOT_DIR "$PythonRuntimeDir") >> $FindPython
+	# echo set(Python_EXECUTABLE "%$PythonRuntimeDir/python.exe") >> $FindPython
+	# echo set(Python_INCLUDE_DIRS "%$PythonRuntimeDir/include") >> $FindPython
+	# echo set(Python_LIBRARIES "%$PythonRuntimeDir/libs/python39.lib") >> $FindPython
+	# echo include(FindPackageHandleStandardArgs)>> $FindPython
+	# echo FIND_PACKAGE_HANDLE_STANDARD_ARGS(Python REQUIRED_VARS Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS VERSION_VAR Python_VERSION) >> $FindPython
+	# echo mark_as_advanced(Python_EXECUTABLE Python_LIBRARIES Python_INCLUDE_DIRS) >> $FindPython
+
+	#>
+
+	# Download installer
+	(New-Object Net.WebClient).DownloadFile("https://www.python.org/ftp/python/$PythonVersion/python-$PythonVersion-amd64.exe", './python_installer.exe')
+
+	# Install Python
+	where.exe /Q python
+	if ( $? -eq 0 ) {
+		./python_installer.exe /uninstall
+	}
+
+	python_installer.exe /quiet "TargetDir=$RuntimeDir" PrependPath=1 CompileAll=1
+	md "$RuntimeDir\Pip"
+
+	setx /M PATH "$Env:PATH;$RuntimeDir"
+	$Env:PATH = "$Env:PATH;$RuntimeDir"
+
+	refreshenv
 }
 
 # Ruby
@@ -282,35 +347,35 @@ function sub-options {
 		$var = $Arguments[$i]
 		if ( "$var" -eq 'base' ) {
 			echo "choco selected"
-			$INSTALL_CHOCO = 1
+			$Global:INSTALL_CHOCO = 1
 		}
 		if ( "$var" -eq 'python' ) {
 			echo "python selected"
-			$INSTALL_PYTHON = 1
+			$Global:INSTALL_PYTHON = 1
 		}
 		if ( "$var" -eq 'ruby' ) {
 			echo "ruby selected"
-			$INSTALL_RUBY = 1
+			$Global:INSTALL_RUBY = 1
 		}
 		if ( "$var" -eq 'rust' ) {
 			echo "rust selected"
-			$INSTALL_RUST = 1
+			$Global:INSTALL_RUST = 1
 		}
 		if ( "$var" -eq 'netcore' ) {
 			echo "netcore selected"
-			$INSTALL_NETCORE = 1
+			$Global:INSTALL_NETCORE = 1
 		}
 		if ( "$var" -eq 'netcore2' ) {
 			echo "netcore 2 selected"
-			$INSTALL_NETCORE2 = 1
+			$Global:INSTALL_NETCORE2 = 1
 		}
 		if ( "$var" -eq 'netcore5' ) {
 			echo "netcore 5 selected"
-			$INSTALL_NETCORE5 = 1
+			$Global:INSTALL_NETCORE5 = 1
 		}
 		if ( "$var" -eq 'rapidjson' ) {
 			echo "rapidjson selected"
-			$INSTALL_RAPIDJSON = 1
+			$Global:INSTALL_RAPIDJSON = 1
 		}
 		if ( "$var" -eq 'funchook' ) {
 			echo "funchook selected"
@@ -318,80 +383,80 @@ function sub-options {
 		}
 		if ( ("$var" -eq 'v8') -or ("$var" -eq 'v8rep54') ) {
 			echo "v8 selected"
-			$INSTALL_V8REPO = 1
-			$INSTALL_V8REPO54 = 1
+			$Global:INSTALL_V8REPO = 1
+			$Global:INSTALL_V8REPO54 = 1
 		}
 		if ( "$var" -eq 'v8rep57' ) {
 			echo "v8 selected"
-			$INSTALL_V8REPO = 1
-			$INSTALL_V8REPO57 = 1
+			$Global:INSTALL_V8REPO = 1
+			$Global:INSTALL_V8REPO57 = 1
 		}
 		if ( "$var" -eq 'v8rep58' ) {
 			echo "v8 selected"
-			$INSTALL_V8REPO = 1
-			$INSTALL_V8REPO58 = 1
+			$Global:INSTALL_V8REPO = 1
+			$Global:INSTALL_V8REPO58 = 1
 		}
 		if ( "$var" -eq 'v8rep52' ) {
 			echo "v8 selected"
-			$INSTALL_V8REPO = 1
-			$INSTALL_V8REPO52 = 1
+			$Global:INSTALL_V8REPO = 1
+			$Global:INSTALL_V8REPO52 = 1
 		}
 		if ( "$var" -eq 'v8rep51' ) {
 			echo "v8 selected"
-			$INSTALL_V8REPO = 1
-			$INSTALL_V8REPO51 = 1
+			$Global:INSTALL_V8REPO = 1
+			$Global:INSTALL_V8REPO51 = 1
 		}
 		if ( "$var" -eq 'nodejs' ) {
 			echo "nodejs selected"
-			$INSTALL_NODEJS = 1
+			$Global:INSTALL_NODEJS = 1
 		}
 		if ( "$var" -eq 'typescript' ) {
 			echo "typescript selected"
-			$INSTALL_TYPESCRIPT = 1
+			$Global:INSTALL_TYPESCRIPT = 1
 		}
 		if ( "$var" -eq 'file' ) {
 			echo "file selected"
-			$INSTALL_FILE = 1
+			$Global:INSTALL_FILE = 1
 		}
 		if ( "$var" -eq 'rpc' ) {
 			echo "rpc selected"
-			$INSTALL_RPC = 1
+			$Global:INSTALL_RPC = 1
 		}
 		if ( "$var" -eq 'wasm' ) {
 			echo "wasm selected"
-			$INSTALL_WASM = 1
+			$Global:INSTALL_WASM = 1
 		}
 		if ( "$var" -eq 'java' ) {
 			echo "java selected"
-			$INSTALL_JAVA = 1
+			$Global:INSTALL_JAVA = 1
 		}
 		if ( "$var" -eq 'c' ) {
 			echo "c selected"
-			$INSTALL_C = 1
+			$Global:INSTALL_C = 1
 		}
 		if ( "$var" -eq 'cobol' ) {
 			echo "cobol selected"
-			$INSTALL_COBOL = 1
+			$Global:INSTALL_COBOL = 1
 		}
 		if ( "$var" -eq 'swig' ) {
 			echo "swig selected"
-			$INSTALL_SWIG = 1
+			$Global:INSTALL_SWIG = 1
 		}
 		if ( "$var" -eq 'metacall' ) {
 			echo "metacall selected"
-			$INSTALL_METACALL = 1
+			$Global:INSTALL_METACALL = 1
 		}
 		if ( "$var" -eq 'pack' ) {
 			echo "pack selected"
-			$INSTALL_PACK = 1
+			$Global:INSTALL_PACK = 1
 		}
 		if ( "$var" -eq 'coverage' ) {
 			echo "coverage selected"
-			$INSTALL_COVERAGE = 1
+			$Global:INSTALL_COVERAGE = 1
 		}
 		if ( "$var" -eq 'clangformat' ) {
 			echo "clangformat selected"
-			$INSTALL_CLANGFORMAT = 1
+			$Global:INSTALL_CLANGFORMAT = 1
 		}
 	}
 }
