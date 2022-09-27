@@ -186,8 +186,7 @@ function sub-configure {
 		$DotNetVersion         = '5.0.12'
 
 		$Global:BUILD_STRING = "$BUILD_STRING " `
-			+ "-DOPTION_BUILD_LOADERS_CS=On " `
-			+ "-DDOTNET_CORE_PATH=/usr/share/dotnet/shared/Microsoft.NETCore.App/1.1.10/"
+			+ "-DOPTION_BUILD_LOADERS_CS=On "
 
 		& {
 			cd ..
