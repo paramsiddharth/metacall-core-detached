@@ -422,7 +422,7 @@ function sub-configure {
 	# cmd.exe /c "cmake -Wno-dev -DOPTION_GIT_HOOKS=Off $BUILD_STRING .."
 	$CustomFlags = '-DOPTION_BUILD_SECURITY=OFF -DOPTION_FORK_SAFE=OFF'
 	echo "BUILD COMMAND: cmake $CustomFlags $BUILD_STRING .."
-	iex "cmake $CustomFlags $BUILD_STRING .."
+	powershell -Command "cmake $CustomFlags $BUILD_STRING .."
 
 	Exit $LASTEXITCODE
 }
