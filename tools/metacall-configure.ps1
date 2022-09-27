@@ -183,7 +183,19 @@ function sub-configure {
 
 	# .NET
 	if ( $BUILD_DOTNET -eq 1 ) {
-		$Global:BUILD_STRING = "$BUILD_STRING -DOPTION_BUILD_LOADERS_CS=On "
+		$DotNetVersion         = '5.0.12'
+
+		$Global:BUILD_STRING = "$BUILD_STRING " `
+			+ "-DOPTION_BUILD_LOADERS_CS=On " `
+			+ "-DDOTNET_CORE_PATH=/usr/share/dotnet/shared/Microsoft.NETCore.App/1.1.10/"
+
+		& {
+			cd ..
+			$LibPath = "$(pwd)\runtimes\dotnet\shared\Microsoft.NETCore.App\$DotNetVersion"
+			echo ".NET LIB PATH LALALALALALALALALALA: $LibPath"
+			# ls $LibPath
+			$Global:BUILD_STRING = "$BUILD_STRING ""-DDOTNET_CORE_PATH=$LibPath"""
+		}
 
 		if ( $BUILD_SCRIPTS -eq 1 ) {
 			$Global:BUILD_STRING = "$BUILD_STRING -DOPTION_BUILD_SCRIPTS_CS=On"
