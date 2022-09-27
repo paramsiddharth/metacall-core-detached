@@ -193,7 +193,7 @@ function sub-configure {
 			$LibPath = "$($(pwd).Path.Replace('\', '/'))/runtimes/dotnet/shared/Microsoft.NETCore.App/$DotNetVersion"
 			echo ".NET LIB PATH LALALALALALALALALALA: $LibPath"
 			# ls $LibPath
-			$Global:BUILD_STRING = "$BUILD_STRING ""-DDOTNET_CORE_PATH=$LibPath"""
+			$Global:BUILD_STRING = "$BUILD_STRING -DDOTNET_CORE_PATH=""$LibPath"""
 		}
 
 		if ( $BUILD_SCRIPTS -eq 1 ) {
