@@ -429,8 +429,8 @@ function sub-configure {
 	}
 
 	$CustomFlags = '-DOPTION_BUILD_SECURITY=OFF -DOPTION_FORK_SAFE=OFF'
-	echo "BUILD COMMAND: cmake $CustomFlags $BUILD_STRING $PathToBuildAt"
-	cmd.exe /c "cmake $CustomFlags $BUILD_STRING $PathToBuildAt"
+	echo "BUILD COMMAND: cmake $PathToBuildAt $CustomFlags $BUILD_STRING"
+	cmd.exe /c "cmake $PathToBuildAt $CustomFlags $BUILD_STRING"
 
 	Exit $LASTEXITCODE
 }
