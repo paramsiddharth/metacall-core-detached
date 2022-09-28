@@ -430,7 +430,7 @@ function sub-configure {
 
 	$CustomFlags = '-DOPTION_BUILD_SECURITY=OFF -DOPTION_FORK_SAFE=OFF'
 	echo "BUILD COMMAND: .\cmake-custom.bat $CustomFlags $BUILD_STRING $PathToBuildAt"
-	cmd.exe /c ".\cmake-custom.bat $CustomFlags $BUILD_STRING $PathToBuildAt"
+	cmd.exe /c """$PSScriptRoot\cmake-custom.bat"" $CustomFlags $BUILD_STRING $PathToBuildAt"
 
 	Exit $LASTEXITCODE
 }
