@@ -420,9 +420,17 @@ function sub-configure {
 	
 	# Execute CMake
 	# cmd.exe /c "cmake -Wno-dev -DOPTION_GIT_HOOKS=Off $BUILD_STRING .."
+	# $PathToBuildAt = '..'
+	$Global:PathToBuildAt = '..'
+
+	& {
+		cd ..
+		$Global:PathToBuildAt = $(pwd)
+	}
+
 	$CustomFlags = '-DOPTION_BUILD_SECURITY=OFF -DOPTION_FORK_SAFE=OFF'
-	echo "BUILD COMMAND: cmake $CustomFlags $BUILD_STRING .."
-	cmd.exe /c "cmake $CustomFlags $BUILD_STRING .."
+	echo "BUILD COMMAND: cmake $CustomFlags $BUILD_STRING $PathToBuildAt"
+	cmd.exe /c "cmake $CustomFlags $BUILD_STRING $PathToBuildAt"
 
 	Exit $LASTEXITCODE
 }
